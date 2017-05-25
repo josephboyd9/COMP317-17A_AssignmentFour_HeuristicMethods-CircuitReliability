@@ -7,7 +7,8 @@ import java.util.stream.Stream;
  * Joseph Boyd (1264974)
  * Amarjot Parmer (idk your id number)
  */
-public class Solve {
+public class Solve
+{
   private static float budget = 0f;
   private static int limit = 0;
   
@@ -18,7 +19,7 @@ public class Solve {
     {
       file = parseArgs( args );
     }
-    catch ( Exception e )
+    catch( Exception e )
     {
       e.printStackTrace();
       return;
@@ -27,6 +28,7 @@ public class Solve {
   
   /**
    * Usage: java Solve <filename> <budget> <limit>
+   *
    * @param args command-line arguments
    * @return File parsed from args[0]
    * @throws Exception
@@ -40,7 +42,7 @@ public class Solve {
   
   /**
    * @param file file to read from
-   * @param n line number in file to be read, must be greater than 0
+   * @param n    line number in file to be read, must be greater than 0
    * @return nth line from file as a String
    * @throws IOException
    */
