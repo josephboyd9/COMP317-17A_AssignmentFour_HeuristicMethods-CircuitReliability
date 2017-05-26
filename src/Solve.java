@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 /**
  * Joseph Boyd (1264974)
- * Amarjot Parmer (idk your id number)
+ * Amarjot Parmer (1255668)
  */
 public class Solve
 {
@@ -25,6 +25,12 @@ public class Solve
       return;
     }
   }
+  
+  /*
+  Sim Aneel 
+  needs to gen next index to compare
+  compare  
+  */
   
   /**
    * Usage: java Solve <filename> <budget> <limit>
