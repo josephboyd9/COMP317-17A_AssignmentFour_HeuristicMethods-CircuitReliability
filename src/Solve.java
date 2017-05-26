@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 
 /**
@@ -9,15 +12,21 @@ import java.util.stream.Stream;
  */
 public class Solve
 {
-  private static float budget = 0f;
-  private static int limit = 0;
+  private static final int NUM_STAGES = 1;
+  
+  private static float budget = 0f;         //total cost allowed to be used across all stages
+  private static int limit = 0;             //max number devices that can be looked up
+  private static LinkedList<Float> rs;      //reliability of device n
+  private static LinkedList<Float> cs;      //cost of device n
+  
+  private static int[] devices = new int[ NUM_STAGES ];   //id of device used at stage n
+  private static int[] num_d = new int[ NUM_STAGES ];     //num devices used at stage n
   
   public static void main( String[] args )
   {
-    File file;
     try
     {
-      file = parseArgs( args );
+      parseArgs( args );
     }
     catch( Exception e )
     {
@@ -27,7 +36,7 @@ public class Solve
   }
   
   /*
-  Sim Aneel 
+  Simulated Annealing
   needs to gen next index to compare
   compare  
   */
@@ -39,14 +48,28 @@ public class Solve
    * @return File parsed from args[0]
    * @throws Exception
    */
-  private static File parseArgs( String[] args ) throws Exception
+  private static void parseArgs( String[] args ) throws Exception
   {
     budget = Float.parseFloat( args[ 1 ] );
     limit = Integer.parseInt( args[ 2 ] );
-    return new File( args[ 0 ] );
+    BufferedReader br = new BufferedReader( new FileReader( args[  0 ] ) );
+    String line;
+    String[] tokens;
+    while( ( line = br.readLine() ) != null )
+    {
+      tokens = line.split( " " );
+      rs.add( Float.parseFloat( tokens[ 0 ] ) );
+      cs.add( Float.parseFloat( tokens[ 1 ] ) );
+    }
+    br.close();
   }
   
+  
+  
+  
   /**
+   * This is impractical for a file of such a small set of devices,
+   * however it would scale well if we needed to look at a very large number of items.
    * @param file file to read from
    * @param n    line number in file to be read, must be greater than 0
    * @return nth line from file as a String
