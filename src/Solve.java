@@ -45,24 +45,27 @@ public class Solve
   }
 
   /**
-   * Takes indexes for 2 devices, calculates and returns most reliable,
+   * Takes indexes for multiple devices, calculates and returns most reliable,
    * assuming as many of given device as budget allows are used
-   * @param a index of device a
-   * @param b index of device b
-   * @return index of most reliable device
+   * @param ds array containing devices to be compared
+   * @return most reliable device
    */
-  private static int compare(device a, int b)
+  private static Device compare( Device[] ds )
   {
-    devices[] ds = { a, b };
     //ds.length instead of hardcoded 2 allows for easy adjustment if needed
-    double[] r_stages = new double[ ds.length ];
-    for( int i = 0; i < ds.length; i++ )
+    double temp = 0;
+    Device best = ds[ 0 ];
+    double r_best = ds[ 0 ].rStage( (int) ( budget / ds[ 0 ].getCost() ) );
+    for( int i = 1; i < ds.length; i++ )
     {
-      r_stages[ i ] = devices.get( ds[ i ] ).rStage(
-          Math.floor( budget / cs.get( a ) ) );
+      temp = ds[ i ].rStage( (int) ( budget / ds[ i ].getCost() ) );
+      if( temp > r_best )
+      {
+        best = ds[ i ];
+        r_best = temp;
+      }
     }
-    //comparision of individual elements of array does NOT allow for easy adjustment :(
-    return ds[ r_stages[ 0 ] > r_stages[ 1 ] ? 0 : 1 ];
+    return best;
   }
   
   private static void iterate()
