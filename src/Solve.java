@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.stream.Stream;
 
 /**
@@ -17,9 +18,10 @@ public class Solve
   private static double budget = 0f;         //total cost allowed to be used across all stages
   private static int limit = 0;             //max number devices that can be looked up
   private static LinkedList<Device> devices = new LinkedList<Device>();
+  private static LinkedList<Device> seen = new LinkedList<Device>();
   
-  private static int[] stages = new int[ NUM_STAGES ];   //id of device used at stage n
-  private static int[] num_d = new int[ NUM_STAGES ];     //num devices used at stage n
+  private static Device[] stages = new Device[ NUM_STAGES ];   //device n used at stage n
+  private static int[] num_d = new int[ NUM_STAGES ];     //num_d[ n ] devices used at stage n
   
   /*
   Simulated Annealing
@@ -68,6 +70,26 @@ public class Solve
     return best;
   }
   
+  /**
+   *
+   * @param old_d
+   * @return
+   */
+  private static Device nextD( Device old_d )
+  {
+    int d_ind = devices.indexOf( old_d ) + ( (int) ( Math.random() * 2 ) == 0 ? -1 : 1 );
+    //if ind is past edges of list, wrap around
+    if( d_ind < 0 )
+    {
+      d_ind = devices.size() - 1;
+    }
+    else if( d_ind >= devices.size() )
+    {
+      d_ind = 0;
+    }
+    return devices.get( d_ind );
+  }
+  
   private static void iterate()
   {
   
@@ -84,8 +106,7 @@ public class Solve
       e.printStackTrace();
       return;
     }
-    //budget -= 1 whenever iterate looks at a device
-    while( budget > 0 )
+    while( seen.size() < limit )
     {
       iterate();
     }
