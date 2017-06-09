@@ -15,19 +15,12 @@ public class Solve
 {
   private static final int NUM_STAGES = 1;
   
-  private static double budget = 0f;         //total cost allowed to be used across all stages
+  private static double budget = 0;         //total cost allowed to be used across all stages
   private static int limit = 0;             //max number devices that can be looked up
   private static LinkedList<Device> devices = new LinkedList<Device>();
-  private static LinkedList<Device> seen = new LinkedList<Device>();
   
   private static Device[] stages = new Device[ NUM_STAGES ];   //device n used at stage n
   private static int[] num_d = new int[ NUM_STAGES ];     //num_d[ n ] devices used at stage n
-  
-  /*
-  Simulated Annealing
-  needs to gen next index to compare
-  compare  
-  */
   
   private static void parseArgs( String[] args ) throws Exception
   {
@@ -40,8 +33,7 @@ public class Solve
     while( ( line = br.readLine() ) != null )
     {
       tokens = line.split( " " );
-      rs.add(Double.parseDouble( tokens[ 0 ] ));
-      cs.add(Double.parseDouble( tokens[ 1 ] ));
+      devices.add( new Device( Double.parseDouble( tokens[ 0 ] ), Double.parseDouble( tokens[ 1 ] ) ) );
     }
     br.close();
   }
@@ -83,20 +75,16 @@ public class Solve
     {
       d_ind = devices.size() - 1;
     }
-    else if( d_ind >= devices.size() )
-    {
-      d_ind = 0;
-    }
+    d_ind %= devices.size();
     return devices.get( d_ind );
-  }
-  
-  private static void iterate()
-  {
-  
   }
   
   public static void main( String[] args )
   {
+    int seen = 0;
+    int new_m = 0;
+    Device new_d;
+    
     try
     {
       parseArgs( args );
@@ -106,10 +94,28 @@ public class Solve
       e.printStackTrace();
       return;
     }
-    while( seen.size() < limit )
+    stages[ 0 ] = devices.get( (int) Math.random() * devices.size() );
+    num_d[ 0 ] = (int) ( budget / stages[ 0 ].getCost() );
+    seen++;
+    System.out.println("Stage 1 v" + Integer.toString( seen ) + ": "
+        + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
+    while( seen < limit )
     {
-      iterate();
+      new_d = nextD( stages[ 0 ] );
+      new_m = (int) ( budget / new_d.getCost() );
+      seen++;
+      if( new_d.rStage( new_m ) >= stages[ 0 ].rStage( num_d[ 0 ] ) )
+      {
+        stages[ 0 ] = new_d;
+        num_d[ 0 ] = new_m;
+        System.out.println( "Stage 1 v" + Integer.toString( seen ) + ": "
+            + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
+      }
     }
+    System.out.println( "Limit reached\n" );
+    System.out.println( "Stage 0: " + Integer.toString( num_d[ 0 ] ) + " x device "
+        + Integer.toString( devices.indexOf( stages[ 0 ] ) ) );
+    System.out.println( "Stage reliability = " + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
   }
   
   
