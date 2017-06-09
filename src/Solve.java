@@ -17,6 +17,7 @@ public class Solve
   
   private static double budget = 0;         //total cost allowed to be used across all stages
   private static int limit = 0;             //max number devices that can be looked up
+  private static int seen = 0;
   private static LinkedList<Device> devices = new LinkedList<Device>();
   
   private static Device[] stages = new Device[ NUM_STAGES ];   //device n used at stage n
@@ -63,25 +64,32 @@ public class Solve
   }
   
   /**
-   *
+   * simple version of simulated annealing. as more comparisons are made,
+   * max jump distance between comparisons shrinks.
+   * Final jump before limit is reached will be +/- 1
    * @param old_d
    * @return
    */
   private static Device nextD( Device old_d )
   {
-    int d_ind = devices.indexOf( old_d ) + ( (int) ( Math.random() * 2 ) == 0 ? -1 : 1 );
-    //if ind is past edges of list, wrap around
-    if( d_ind < 0 )
+    int offset = (int) ( Math.random() * 2 * ( limit - seen ) );
+    if( offset <= 0 )
     {
-      d_ind = devices.size() - 1;
+      offset--;
+    }
+    int d_ind = devices.indexOf( old_d ) + offset;
+    //if ind is past edges of list, wrap around
+    while( d_ind < 0 )
+    {
+      d_ind += devices.size();
     }
     d_ind %= devices.size();
     return devices.get( d_ind );
   }
   
+  
   public static void main( String[] args )
   {
-    int seen = 0;
     int new_m = 0;
     Device new_d;
     
@@ -94,10 +102,12 @@ public class Solve
       e.printStackTrace();
       return;
     }
+    checkAll();
     stages[ 0 ] = devices.get( (int) Math.random() * devices.size() );
     num_d[ 0 ] = (int) ( budget / stages[ 0 ].getCost() );
     seen++;
-    System.out.println("Stage 1 v" + Integer.toString( seen ) + ": "
+    System.out.println("Stage 1 v" + Integer.toString( seen ) + ": D"
+        + Integer.toString( devices.indexOf( stages[ 0 ] ) ) + ", R"
         + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
     while( seen < limit )
     {
@@ -108,7 +118,8 @@ public class Solve
       {
         stages[ 0 ] = new_d;
         num_d[ 0 ] = new_m;
-        System.out.println( "Stage 1 v" + Integer.toString( seen ) + ": "
+        System.out.println( "Stage 1 v" + Integer.toString( seen ) + ": D"
+            + Integer.toString( devices.indexOf( stages[ 0 ] ) ) + ", R"
             + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
       }
     }
@@ -116,6 +127,7 @@ public class Solve
     System.out.println( "Stage 0: " + Integer.toString( num_d[ 0 ] ) + " x device "
         + Integer.toString( devices.indexOf( stages[ 0 ] ) ) );
     System.out.println( "Stage reliability = " + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
+    
   }
   
   
@@ -134,5 +146,19 @@ public class Solve
   {
     Stream<String> lines = Files.lines( file.toPath() );
     return lines.skip( n - 1 ).findFirst().get();
+  }
+  
+  /**
+   * For testing.
+   * Prints reliability of a stage using each available device, given max budget
+   */
+  private static void checkAll()
+  {
+    for( Device d : devices )
+    {
+      System.out.println( "RDevice" + Integer.toString( devices.indexOf( d ) ) + ": "
+          + Double.toString( d.rStage( (int) ( budget / d.getCost() ) ) ) );
+    }
+    System.out.println();
   }
 }
