@@ -123,11 +123,18 @@ public class Solve
             + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
       }
     }
-    System.out.println( "Limit reached\n" );
-    System.out.println( "Stage 0: " + Integer.toString( num_d[ 0 ] ) + " x device "
-        + Integer.toString( devices.indexOf( stages[ 0 ] ) ) );
-    System.out.println( "Stage reliability = " + Double.toString( stages[ 0 ].rStage( num_d[ 0 ] ) ) );
-    
+    Double total_r = 1.0;
+    Double total_c = 0.0;
+    for( int i = 0; i < NUM_STAGES; i++ )
+    {
+      System.out.println( "Stage " + i + ", R" + Double.toString( stages[ i ].getRelability() ) + ", C"
+          + Double.toString( stages[ i ].getCost() ) + ", " + Integer.toString( num_d[ i ] ) + "x, Total R"
+          + Double.toString( stages[ i ].rStage( num_d[ i ] ) ) + ", Total C"
+          + Double.toString( stages[ i ].getCost() * (double) num_d[ i ] ) );
+      total_r *= stages[ i ].rStage( num_d[ i ] );
+      total_c += stages[ i ].getCost() * (double) num_d[ i ];
+    }
+    System.out.println( "\nTotal circuit reliability: " + Double.toString( total_r ) + ", Cost: " + Double.toString( total_c ) );
   }
   
   
